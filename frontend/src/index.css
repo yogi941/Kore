@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { 
+    @apply box-border; 
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  body { 
+    @apply bg-[#ffffff] text-[#282c3f] antialiased; 
+  }
+  
+  /* Modern premium scrollbar */
+  ::-webkit-scrollbar { 
+    width: 6px; 
+    height: 6px; 
+  }
+  ::-webkit-scrollbar-track { 
+    @apply bg-gray-50; 
+  }
+  ::-webkit-scrollbar-thumb { 
+    @apply bg-gray-300 rounded-full hover:bg-gray-400 transition-colors; 
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  
+  /* Premium Swiggy style shadows and card designs */
+  .swiggy-card-shadow {
+    box-shadow: 0 4px 16px 0 rgba(0,0,0,.08);
+  }
+  
+  .swiggy-card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+  .swiggy-card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px 0 rgba(0,0,0,.12);
+  }
+  
+  /* Square border Veg badge (Green) */
+  .swiggy-veg-icon {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #0f8a65;
+    border-radius: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: transparent;
+  }
+  .swiggy-veg-icon::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #0f8a65;
+    position: absolute;
+  }
+
+  /* Square border Non-Veg badge (Red) */
+  .swiggy-nonveg-icon {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #e43b4f;
+    border-radius: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: transparent;
+  }
+  .swiggy-nonveg-icon::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #e43b4f;
+    position: absolute;
+  }
+}
