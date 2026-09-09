@@ -7,12 +7,7 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [canteenId, setCanteenId] = useState(null);
 
-  const addToCart = useCallback((item, itemCanteenId) => {
-    if (canteenId && canteenId !== itemCanteenId) {
-      toast.error('You can only order from one canteen at a time. Clear your cart first.');
-      return;
-    }
-    setCanteenId(itemCanteenId);
+  const addToCart = useCallback((item, itemCanteenId, canteenName = '') => {
     setCartItems((prev) => {
       const existing = prev.find((i) => i._id === item._id);
       if (existing) {
@@ -20,10 +15,10 @@ export const CartProvider = ({ children }) => {
           i._id === item._id ? { ...i, quantity: i.quantity + 1 } : i
         );
       }
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, { ...item, quantity: 1, canteenId: itemCanteenId || item.canteen, canteenName: canteenName || item.canteenName || 'Canteen' }];
     });
-    toast.success(`${item.name} added to cart`);
-  }, [canteenId]);
+    toast.success(`${item.name} added to multi-shop cart`);
+  }, []);
 
   const removeFromCart = useCallback((itemId) => {
     setCartItems((prev) => {

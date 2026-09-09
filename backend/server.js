@@ -19,8 +19,16 @@ const orderRoutes = require('./routes/orderRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const groupOrderRoutes = require('./routes/groupOrderRoutes');
+const mlRoutes = require('./routes/mlRoutes');
+const { getAdminAnalytics } = require('./controllers/analyticsController');
+const { verifyAndCollectQR } = require('./controllers/qrVerificationController');
+const protect = require('./middleware/authMiddleware');
+const authorize = require('./middleware/roleMiddleware');
+const { initWorkers } = require('./jobs/workers');
 
 connectDB();
+initWorkers();
 
 const app = express();
 const server = http.createServer(app);
@@ -55,6 +63,12 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/group', groupOrderRoutes);
+app.use('/api/ml', mlRoutes);
+
+// Analytics and QR Pickup verification endpoints
+app.get('/api/analytics', protect, authorize('canteen_admin', 'super_admin', 'shop_manager'), getAdminAnalytics);
+app.post('/api/orders/qr-verify', protect, authorize('canteen_admin', 'super_admin', 'shop_manager'), verifyAndCollectQR);
 
 app.use(errorHandler);
 

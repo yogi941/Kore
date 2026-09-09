@@ -12,6 +12,7 @@ import Menu from './pages/student/Menu';
 import Cart from './pages/student/Cart';
 import Orders from './pages/student/Orders';
 import Profile from './pages/student/Profile';
+import GroupOrder from './pages/student/GroupOrder';
 
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminOrders from './pages/admin/AdminOrders';
@@ -57,6 +58,8 @@ const AppRoutes = () => (
         <Route path="/cart" element={<Cart />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/group" element={<GroupOrder />} />
+        <Route path="/group/:groupCode" element={<GroupOrder />} />
       </Route>
 
       {/* Admin protected routes */}

@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, QrCode, Sparkles } from 'lucide-react';
 import Navbar from '../../components/common/Navbar';
 import Loader from '../../components/common/Loader';
+import QRScannerModal from '../../components/admin/QRScannerModal';
 import { getCanteenOrders, updateOrderStatus, verifyPickupToken, claimOrder } from '../../api/orderApi';
 import useSocket from '../../hooks/useSocket';
 import toast from 'react-hot-toast';
@@ -36,6 +37,7 @@ const AdminOrders = () => {
   const [verifiedOrder, setVerifiedOrder] = useState(null);
   const [verifying, setVerifying] = useState(false);
   const [claiming, setClaiming] = useState(false);
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
 
   const handleVerifyToken = async (e) => {
     e.preventDefault();
@@ -123,17 +125,33 @@ const AdminOrders = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
+      <QRScannerModal
+        isOpen={isQRModalOpen}
+        onClose={() => setIsQRModalOpen(false)}
+        onVerified={loadOrders}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Manage Orders</h1>
-          <button
-            onClick={loadOrders}
-            className="flex items-center gap-2 text-sm text-gray-600 hover:text-orange-500 transition-colors"
-          >
-            <RefreshCw className="w-4 h-4" /> Refresh
-          </button>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Kitchen Order Dispatch</h1>
+            <p className="text-xs text-gray-500">Sorted by Priority Queue & SPT Scheduler</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsQRModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-colors shadow-sm"
+            >
+              <QrCode className="w-4 h-4 text-orange-400" /> Scan QR Pickup
+            </button>
+            <button
+              onClick={loadOrders}
+              className="flex items-center gap-2 text-sm text-gray-600 hover:text-orange-500 transition-colors"
+            >
+              <RefreshCw className="w-4 h-4" /> Refresh
+            </button>
+          </div>
         </div>
 
         {/* Filters */}

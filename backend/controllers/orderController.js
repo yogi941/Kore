@@ -1,10 +1,13 @@
 const Order = require('../models/Order');
+const ParentOrder = require('../models/ParentOrder');
 const MenuItem = require('../models/MenuItem');
 const Canteen = require('../models/Canteen');
 const Notification = require('../models/Notification');
 const generateQRCode = require('../utils/generateQR');
 const sendResponse = require('../utils/sendResponse');
 const { getIO } = require('../config/socket');
+const { scheduleKitchenQueue } = require('../services/schedulingService');
+const { scheduleUnpaidOrderCancellation } = require('../jobs/queue');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 
@@ -27,67 +30,124 @@ exports.placeOrder = async (req, res, next) => {
   try {
     const { canteenId, items, pickupSlot, specialInstructions } = req.body;
 
-    // Time window validations (IST / UTC+5:30)
-    if (pickupSlot) {
-      const now = new Date();
-      const istString = now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
-      const istTime = new Date(istString);
-      const hours = istTime.getHours();
-      const minutes = istTime.getMinutes();
-      const currentTimeInMinutes = (hours * 60) + minutes;
-
-      const slotLabel = pickupSlot.label.toLowerCase();
-      if (slotLabel.includes('morning') || slotLabel.includes('breakfast')) {
-        if (currentTimeInMinutes < 510 || currentTimeInMinutes > 615) {
-          return sendResponse(res, 400, false, 'Pre-ordering for Morning Break is only allowed from 8:30 AM to 10:15 AM');
-        }
-      }
-      if (slotLabel.includes('lunch')) {
-        if (currentTimeInMinutes < 660 || currentTimeInMinutes > 735) {
-          return sendResponse(res, 400, false, 'Pre-ordering for Lunch Break is only allowed from 11:00 AM to 12:15 PM');
-        }
-      }
-    }
-
     if (!items || items.length === 0) {
       return sendResponse(res, 400, false, 'Order must have at least one item');
     }
 
-    const canteen = await Canteen.findById(canteenId);
-    if (!canteen || !canteen.isOpen) {
-      return sendResponse(res, 400, false, 'Canteen is not available');
+    // Fetch details for all menu items in cart
+    const itemIds = items.map((i) => i.menuItem || i._id);
+    const dbMenuItems = await MenuItem.find({ _id: { $in: itemIds }, isAvailable: true }).populate('canteen');
+
+    if (dbMenuItems.length === 0) {
+      return sendResponse(res, 400, false, 'Selected items are not available');
     }
 
-    let totalAmount = 0;
-    const validatedItems = [];
+    // Group cart items by Canteen ID
+    const itemsByCanteen = {};
 
     for (const orderItem of items) {
-      const menuItem = await MenuItem.findOne({
-        _id: orderItem.menuItem,
-        canteen: canteenId,
-        isAvailable: true,
-      });
+      const targetId = (orderItem.menuItem || orderItem._id).toString();
+      const menuItem = dbMenuItems.find((m) => m._id.toString() === targetId);
 
       if (!menuItem) {
-        return sendResponse(res, 400, false, `Item "${orderItem.menuItem}" is not available`);
+        return sendResponse(res, 400, false, `Item is currently unavailable`);
       }
 
-      const subtotal = menuItem.price * orderItem.quantity;
-      totalAmount += subtotal;
+      const cId = (canteenId || menuItem.canteen._id || menuItem.canteen).toString();
+      if (!itemsByCanteen[cId]) {
+        itemsByCanteen[cId] = {
+          canteen: menuItem.canteen,
+          items: [],
+          subtotal: 0,
+        };
+      }
 
-      validatedItems.push({
+      const itemPrice = menuItem.price;
+      const qty = orderItem.quantity || 1;
+      const subtotal = itemPrice * qty;
+
+      itemsByCanteen[cId].subtotal += subtotal;
+      itemsByCanteen[cId].items.push({
         menuItem: menuItem._id,
         name: menuItem.name,
-        price: menuItem.price,
-        quantity: orderItem.quantity,
+        price: itemPrice,
+        quantity: qty,
+        addedBy: req.user._id,
+        addedByName: req.user.name,
       });
     }
+
+    const canteenIds = Object.keys(itemsByCanteen);
+    const isMultiShop = canteenIds.length > 1;
+    let totalOrderAmount = 0;
+    canteenIds.forEach((id) => (totalOrderAmount += itemsByCanteen[id].subtotal));
+
+    // Handle Multi-Shop Order Placement (Parent Order + Child Shop Orders)
+    if (isMultiShop) {
+      const parentOrder = await ParentOrder.create({
+        student: req.user._id,
+        totalAmount: totalOrderAmount,
+        pickupSlot,
+        specialInstructions,
+        shopOrders: [],
+      });
+
+      const shopOrderDocs = [];
+
+      for (const cId of canteenIds) {
+        const groupData = itemsByCanteen[cId];
+        const shopOrder = await Order.create({
+          parentOrder: parentOrder._id,
+          student: req.user._id,
+          canteen: cId,
+          items: groupData.items,
+          totalAmount: groupData.subtotal,
+          pickupSlot,
+          specialInstructions,
+          statusHistory: [{ status: 'pending', changedBy: req.user._id }],
+        });
+
+        const qrData = { orderId: shopOrder._id, pickupToken: shopOrder.pickupToken };
+        shopOrder.qrCode = await generateQRCode(qrData);
+        await shopOrder.save();
+
+        shopOrderDocs.push(shopOrder._id);
+
+        const populated = await Order.findById(shopOrder._id)
+          .populate('canteen', 'name location admin')
+          .populate('items.menuItem', 'name image');
+
+        getIO().to(`canteen_${cId}`).emit('new_order', populated);
+
+        await Canteen.findByIdAndUpdate(cId, { $inc: { totalOrders: 1 } });
+      }
+
+      parentOrder.shopOrders = shopOrderDocs;
+      await parentOrder.save();
+
+      // Schedule background unpaid cancellation timer
+      scheduleUnpaidOrderCancellation(parentOrder._id, 15 * 60 * 1000);
+
+      await createNotification(
+        req.user._id,
+        'order_placed',
+        'Multi-Shop Order Placed',
+        `Your multi-shop order #${parentOrder.parentOrderNumber} has been placed across ${canteenIds.length} shops!`,
+        parentOrder._id
+      );
+
+      return sendResponse(res, 201, true, 'Multi-Shop Order placed successfully', parentOrder);
+    }
+
+    // Handle Single Shop Order Placement
+    const singleCanteenId = canteenIds[0];
+    const groupData = itemsByCanteen[singleCanteenId];
 
     const order = await Order.create({
       student: req.user._id,
-      canteen: canteenId,
-      items: validatedItems,
-      totalAmount,
+      canteen: singleCanteenId,
+      items: groupData.items,
+      totalAmount: groupData.subtotal,
       pickupSlot,
       specialInstructions,
       statusHistory: [{ status: 'pending', changedBy: req.user._id }],
@@ -103,19 +163,20 @@ exports.placeOrder = async (req, res, next) => {
     await order.save();
 
     await MenuItem.updateMany(
-      { _id: { $in: validatedItems.map((i) => i.menuItem) } },
+      { _id: { $in: groupData.items.map((i) => i.menuItem) } },
       { $inc: { totalOrdered: 1 } }
     );
 
-    await Canteen.findByIdAndUpdate(canteenId, { $inc: { totalOrders: 1 } });
+    await Canteen.findByIdAndUpdate(singleCanteenId, { $inc: { totalOrders: 1 } });
+
+    // Schedule background unpaid cancellation timer
+    scheduleUnpaidOrderCancellation(order._id, 15 * 60 * 1000);
 
     const populatedOrder = await Order.findById(order._id)
-      .populate('canteen', 'name location')
+      .populate('canteen', 'name location admin')
       .populate('items.menuItem', 'name image');
 
-    getIO()
-      .to(`canteen_${canteenId}`)
-      .emit('new_order', populatedOrder);
+    getIO().to(`canteen_${singleCanteenId}`).emit('new_order', populatedOrder);
 
     await createNotification(
       req.user._id,
@@ -124,16 +185,6 @@ exports.placeOrder = async (req, res, next) => {
       `Your order #${order.orderNumber} has been placed successfully.`,
       order._id
     );
-
-    if (canteen.admin) {
-      await createNotification(
-        canteen.admin,
-        'order_placed',
-        'New Order Received',
-        `New order #${order.orderNumber} received.`,
-        order._id
-      );
-    }
 
     return sendResponse(res, 201, true, 'Order placed successfully', populatedOrder);
   } catch (error) {
@@ -250,15 +301,19 @@ exports.getCanteenOrders = async (req, res, next) => {
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    const [orders, total] = await Promise.all([
+    const [rawOrders, total] = await Promise.all([
       Order.find(filter)
         .populate('student', 'name email rollNumber phone')
-        .populate('items.menuItem', 'name')
+        .populate('items.menuItem', 'name preparationTime category')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(parseInt(limit)),
       Order.countDocuments(filter),
     ]);
+
+    // Active workload count (preparing items)
+    const preparingCount = await Order.countDocuments({ canteen: canteenId, status: 'preparing' });
+    const orders = scheduleKitchenQueue(rawOrders, preparingCount);
 
     return sendResponse(res, 200, true, 'Canteen orders fetched', {
       orders,

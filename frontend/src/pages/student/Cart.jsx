@@ -8,8 +8,10 @@ import toast from 'react-hot-toast';
 import useAuth from '../../hooks/useAuth';
 
 const PICKUP_SLOTS = [
-  { label: 'Morning Break (10:30 AM)', time: 'Pre-order window: 8:30 AM – 10:15 AM' },
-  { label: 'Lunch Break (12:30 PM)', time: 'Pre-order window: 11:00 AM – 12:15 PM' },
+  { label: 'Immediate Pickup (10-15 mins)', time: 'Fast preparation order' },
+  { label: 'Morning Break (10:30 AM)', time: 'Pre-order for Morning Break' },
+  { label: 'Lunch Break (12:30 PM)', time: 'Pre-order for Lunch Break' },
+  { label: 'Evening Snack Break (4:30 PM)', time: 'Pre-order for Evening Break' },
 ];
 
 const loadRazorpayScript = () => {
@@ -231,29 +233,20 @@ const Cart = () => {
                 <Clock className="w-4 h-4 text-orange-500" /> Select Pickup Slot
               </h3>
               <div className="space-y-2">
-                {PICKUP_SLOTS.map((slot) => {
-                  const expired = isSlotExpired(slot.label);
-                  return (
-                    <button
-                      key={slot.label}
-                      disabled={expired}
-                      onClick={() => setSelectedSlot(slot)}
-                      className={`w-full text-left p-3 rounded-xl border text-sm transition-all ${
-                        expired
-                          ? 'border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed'
-                          : selectedSlot?.label === slot.label
-                            ? 'border-orange-400 bg-orange-50 text-orange-700'
-                            : 'border-gray-200 hover:border-orange-200 text-gray-700'
-                      }`}
-                    >
-                      <div className="flex justify-between items-center">
-                        <p className="font-medium">{slot.label}</p>
-                        {expired && <span className="text-[10px] bg-red-100 text-red-600 font-bold px-1.5 py-0.5 rounded uppercase">Closed</span>}
-                      </div>
-                      <p className="text-xs text-gray-500 mt-0.5">{slot.time}</p>
-                    </button>
-                  );
-                })}
+                {PICKUP_SLOTS.map((slot) => (
+                  <button
+                    key={slot.label}
+                    onClick={() => setSelectedSlot(slot)}
+                    className={`w-full text-left p-3 rounded-xl border text-sm transition-all ${
+                      selectedSlot?.label === slot.label
+                        ? 'border-orange-400 bg-orange-50 text-orange-700 font-semibold'
+                        : 'border-gray-200 hover:border-orange-200 text-gray-700'
+                    }`}
+                  >
+                    <p className="font-medium">{slot.label}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{slot.time}</p>
+                  </button>
+                ))}
               </div>
             </div>
 

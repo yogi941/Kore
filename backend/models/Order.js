@@ -10,6 +10,12 @@ const orderItemSchema = new mongoose.Schema({
   name: { type: String, required: true },
   price: { type: Number, required: true },
   quantity: { type: Number, required: true, min: 1 },
+  addedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null,
+  },
+  addedByName: { type: String, default: null },
 });
 
 const orderSchema = new mongoose.Schema(
@@ -18,6 +24,11 @@ const orderSchema = new mongoose.Schema(
       type: String,
       unique: true,
       default: () => `KCT-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    },
+    parentOrder: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ParentOrder',
+      default: null,
     },
     student: {
       type: mongoose.Schema.Types.ObjectId,

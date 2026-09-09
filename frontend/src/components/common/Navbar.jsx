@@ -77,6 +77,7 @@ const Navbar = () => {
   const studentLinks = [
     { label: 'Home', path: '/home' },
     { label: 'Canteens', path: '/canteens' },
+    { label: 'Group Orders', path: '/group' },
     { label: 'My Orders', path: '/orders' },
   ];
 

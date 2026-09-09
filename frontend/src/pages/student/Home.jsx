@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, Star, ChevronRight, Zap } from 'lucide-react';
+import { Clock, Star, ChevronRight, Zap, Users } from 'lucide-react';
 import Navbar from '../../components/common/Navbar';
 import Loader from '../../components/common/Loader';
+import RecommendationCarousel from '../../components/student/RecommendationCarousel';
 import useAuth from '../../hooks/useAuth';
 import { fetchCanteens } from '../../api/canteenApi';
 
@@ -50,21 +51,42 @@ const Home = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-        {/* Quick Action Banner */}
-        <div className="bg-orange-50 border border-orange-100 rounded-2xl p-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white" />
+        {/* Recommendation Carousel */}
+        <RecommendationCarousel />
+
+        {/* Quick Action Banners */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-orange-50 border border-orange-100 rounded-2xl p-5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
+                <Zap className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">Multi-Shop Ordering</p>
+                <p className="text-xs text-gray-500">Order from Main Core + Munch Box together</p>
+              </div>
             </div>
-            <div>
-              <p className="font-semibold text-gray-900 text-sm">Order before the rush!</p>
-              <p className="text-xs text-gray-500">Pre-order 30 mins before your break</p>
-            </div>
+            <Link to="/canteens"
+              className="bg-orange-500 text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-orange-600 transition-colors">
+              Order Now
+            </Link>
           </div>
-          <Link to="/canteens"
-            className="bg-orange-500 text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-orange-600 transition-colors">
-            Order Now
-          </Link>
+
+          <div className="bg-purple-50 border border-purple-100 rounded-2xl p-5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center">
+                <Users className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">Group Ordering Room</p>
+                <p className="text-xs text-gray-500">Order with friends & split the bill live</p>
+              </div>
+            </div>
+            <Link to="/group"
+              className="bg-purple-600 text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-purple-700 transition-colors">
+              Start Group
+            </Link>
+          </div>
         </div>
 
         {/* Canteens Section */}
