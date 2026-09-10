@@ -1,12 +1,41 @@
 const Canteen = require('../models/Canteen');
+const Order = require('../models/Order');
+const { predictPrepAndWaitTime } = require('../services/mlService');
 const sendResponse = require('../utils/sendResponse');
 
 exports.getAllCanteens = async (req, res, next) => {
   try {
     const canteens = await Canteen.find()
       .populate('admin', 'name email')
-      .sort({ name: 1 });
-    return sendResponse(res, 200, true, 'Canteens fetched', canteens);
+      .sort({ name: 1 })
+      .lean();
+
+    // Attach real-time queue status & ML prediction to each canteen
+    const enrichedCanteens = await Promise.all(
+      canteens.map(async (canteen) => {
+        const activeOrdersCount = await Order.countDocuments({
+          canteen: canteen._id,
+          status: { $in: ['accepted', 'preparing', 'pending'] },
+        });
+
+        const mlPrediction = predictPrepAndWaitTime({
+          items: [{ category: 'lunch', quantity: 2 }],
+          queueLength: activeOrdersCount,
+          kitchenWorkload: activeOrdersCount * 2,
+        });
+
+        return {
+          ...canteen,
+          activeOrdersCount,
+          estimatedWaitMinutes: mlPrediction.predictedWaitTime,
+          waitRange: mlPrediction.formattedRange,
+          queueStatus: mlPrediction.queueStatus,
+          queueColor: mlPrediction.queueColor,
+        };
+      })
+    );
+
+    return sendResponse(res, 200, true, 'Canteens fetched', enrichedCanteens);
   } catch (error) {
     next(error);
   }

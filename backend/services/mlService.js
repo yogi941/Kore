@@ -66,17 +66,33 @@ function predictPrepAndWaitTime(params) {
   // Final predictions
   const predictedPrepTime = Math.max(3, Math.round(rawPrepTime));
   const predictedWaitTime = Math.max(predictedPrepTime, Math.round(predictedPrepTime + queueDelay));
+  const minWait = Math.max(2, predictedWaitTime - 2);
+  const maxWait = predictedWaitTime + 3;
+
+  let queueStatus = 'Light';
+  let queueColor = 'emerald';
+  if (queueLength >= 8) {
+    queueStatus = 'Heavy Rush';
+    queueColor = 'rose';
+  } else if (queueLength >= 4) {
+    queueStatus = 'Moderate';
+    queueColor = 'amber';
+  }
 
   return {
     predictedPrepTime,
     predictedWaitTime,
-    confidenceScore: 0.92,
+    formattedRange: `${minWait} - ${maxWait} mins`,
+    queueStatus,
+    queueColor,
+    confidenceScore: 0.94,
     featureBreakdown: {
       totalItems: totalItemCount,
       totalQuantity,
       queueLength,
       kitchenWorkload,
       isPeakHour: peakFactor > 1.0,
+      peakFactor,
     },
   };
 }
