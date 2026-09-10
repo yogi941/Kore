@@ -8,19 +8,25 @@
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
   body { 
-    @apply bg-slate-950 text-slate-100 antialiased selection:bg-amber-500 selection:text-slate-950; 
+    @apply bg-[#f8f9fa] text-[#1e293b] antialiased selection:bg-orange-500 selection:text-white; 
   }
   
-  /* Modern premium custom scrollbar */
+  /* Inputs force crisp dark text color across all browsers & extensions */
+  input, textarea, select {
+    color: #0f172a !important;
+    background-color: #ffffff !important;
+  }
+  
+  /* Modern Swiggy style scrollbar */
   ::-webkit-scrollbar { 
     width: 6px; 
     height: 6px; 
   }
   ::-webkit-scrollbar-track { 
-    @apply bg-slate-900; 
+    @apply bg-gray-100; 
   }
   ::-webkit-scrollbar-thumb { 
-    @apply bg-slate-700 rounded-full hover:bg-amber-500 transition-colors; 
+    @apply bg-orange-400/60 rounded-full hover:bg-orange-500 transition-colors; 
   }
 }
 
@@ -28,61 +34,31 @@
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-  /* Premium Glassmorphism & Shimmer */
-  .glass-panel {
-    background: rgba(15, 23, 42, 0.75);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+  /* Premium Swiggy style cards & shadows */
+  .swiggy-card {
+    background: #ffffff;
+    border: 1px solid rgba(229, 231, 235, 0.8);
+    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05);
   }
 
-  .glass-panel-hover {
+  .swiggy-card-hover {
     @apply transition-all duration-300 ease-out;
   }
-  .glass-panel-hover:hover {
+  .swiggy-card-hover:hover {
     transform: translateY(-4px);
-    border-color: rgba(245, 158, 11, 0.4);
-    box-shadow: 0 12px 32px 0 rgba(245, 158, 11, 0.15);
+    box-shadow: 0 12px 30px 0 rgba(249, 115, 22, 0.15);
+    border-color: rgba(249, 115, 22, 0.3);
   }
 
-  .glow-amber {
-    box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.3);
+  .glow-orange {
+    box-shadow: 0 0 25px -5px rgba(249, 115, 22, 0.35);
   }
 
-  .glow-emerald {
-    box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.3);
-  }
-
-  /* Shimmer effect */
-  @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-
-  .animate-shimmer {
-    position: relative;
-    overflow: hidden;
-  }
-  .animate-shimmer::after {
-    position: absolute;
-    top: 0; right: 0; bottom: 0; left: 0;
-    transform: translateX(-100%);
-    background-image: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 0,
-      rgba(255, 255, 255, 0.08) 20%,
-      rgba(255, 255, 255, 0.15) 60%,
-      rgba(255, 255, 255, 0)
-    );
-    animation: shimmer 2.5s infinite;
-    content: '';
-  }
-  
   /* Square border Veg badge (Green) */
   .swiggy-veg-icon {
     width: 14px;
     height: 14px;
-    border: 2px solid #10b981;
+    border: 2px solid #0f8a65;
     border-radius: 3px;
     display: inline-flex;
     align-items: center;
@@ -95,7 +71,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background-color: #10b981;
+    background-color: #0f8a65;
     position: absolute;
   }
 
@@ -103,7 +79,7 @@
   .swiggy-nonveg-icon {
     width: 14px;
     height: 14px;
-    border: 2px solid #ef4444;
+    border: 2px solid #e43b4f;
     border-radius: 3px;
     display: inline-flex;
     align-items: center;
@@ -116,7 +92,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background-color: #ef4444;
+    background-color: #e43b4f;
     position: absolute;
   }
 }
