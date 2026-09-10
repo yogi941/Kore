@@ -39,7 +39,11 @@ const Register = () => {
       const { data } = await registerUser({ name, email, password, rollNumber, phone });
       login(data.data.user, data.data.token);
       toast.success('Account created successfully!');
-      navigate('/home');
+      try {
+        navigate('/home');
+      } catch {
+        window.location.href = '/home';
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Registration failed');
     } finally {

@@ -35,10 +35,12 @@ const Login = () => {
       login(data.data.user, data.data.token);
       toast.success('Welcome back!');
       const role = data.data.user.role;
-      if (role === 'canteen_admin' || role === 'super_admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/home');
+      const targetPath = (role === 'canteen_admin' || role === 'super_admin') ? '/admin/dashboard' : '/home';
+      
+      try {
+        navigate(targetPath);
+      } catch {
+        window.location.href = targetPath;
       }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Login failed');
