@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Clock, Star, ChevronRight, Zap, Users, Cpu, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Clock, Star, ChevronRight, Zap, Users } from 'lucide-react';
 import Navbar from '../../components/common/Navbar';
 import Loader from '../../components/common/Loader';
 import RecommendationCarousel from '../../components/student/RecommendationCarousel';
@@ -10,8 +9,8 @@ import { fetchCanteens } from '../../api/canteenApi';
 
 const BREAK_SLOTS = [
   { label: 'Breakfast', time: '8:30 AM – 9:00 AM', icon: '🌅' },
-  { label: 'Lunch Break', time: '12:30 PM – 1:30 PM', icon: '🍱' },
-  { label: 'Evening Snacks', time: '4:00 PM – 4:30 PM', icon: '☕' },
+  { label: 'Lunch', time: '12:30 PM – 1:30 PM', icon: '🍱' },
+  { label: 'Evening', time: '4:00 PM – 4:30 PM', icon: '☕' },
 ];
 
 const Home = () => {
@@ -27,203 +26,146 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-16">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      {/* Hero Header Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-950 to-amber-950/40 border-b border-slate-800">
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute bottom-0 left-10 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      {/* Hero */}
+      <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <p className="text-orange-100 text-sm font-medium mb-1">Good day,</p>
+          <h1 className="text-3xl font-bold mb-2">{user?.name?.split(' ')[0]} 👋</h1>
+          <p className="text-orange-100 text-sm">Pre-order your meal and skip the queue</p>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-extrabold mb-4"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>AI-Driven Campus Dining System</span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-4xl sm:text-5xl font-black tracking-tight text-slate-100 mb-3"
-          >
-            Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-amber-300">{user?.name?.split(' ')[0]} 👋</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-slate-400 text-sm sm:text-base max-w-2xl leading-relaxed mb-6"
-          >
-            Skip long canteen queues. Pre-order your meals, track ML wait predictions in real time, and split group orders with friends!
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex flex-wrap gap-3"
-          >
+          <div className="mt-6 flex flex-wrap gap-3">
             {BREAK_SLOTS.map((slot) => (
-              <div
-                key={slot.label}
-                className="flex items-center gap-3 bg-slate-900/80 border border-slate-800/90 rounded-2xl px-4 py-2.5 backdrop-blur-md shadow-lg"
-              >
-                <span className="text-xl">{slot.icon}</span>
+              <div key={slot.label} className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
+                <span className="text-lg">{slot.icon}</span>
                 <div>
-                  <p className="text-xs font-bold text-slate-200">{slot.label}</p>
-                  <p className="text-[10px] text-amber-400 font-mono font-medium">{slot.time}</p>
+                  <p className="text-xs font-semibold">{slot.label}</p>
+                  <p className="text-xs text-orange-100">{slot.time}</p>
                 </div>
               </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
         {/* Recommendation Carousel */}
         <RecommendationCarousel />
 
-        {/* Quick Action Interactive Cards */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <motion.div
-            whileHover={{ y: -4, scale: 1.01 }}
-            className="bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/30 border border-slate-800 hover:border-amber-500/40 rounded-3xl p-6 shadow-2xl backdrop-blur-xl flex items-center justify-between group transition-all"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-slate-950 shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform">
-                <Zap className="w-6 h-6" />
+        {/* Quick Action Banners */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-orange-50 border border-orange-100 rounded-2xl p-5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
+                <Zap className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-extrabold text-slate-100 text-base group-hover:text-amber-400 transition-colors">Multi-Shop Cart</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Combine items from Main Core + Munch Box into 1 order</p>
+                <p className="font-semibold text-gray-900 text-sm">Multi-Shop Ordering</p>
+                <p className="text-xs text-gray-500">Order from Main Core + Munch Box together</p>
               </div>
             </div>
-            <Link
-              to="/canteens"
-              className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black px-4 py-2.5 rounded-xl transition-all flex items-center gap-1 shadow-lg shadow-amber-500/20"
-            >
-              Order Now <ArrowRight className="w-3.5 h-3.5" />
+            <Link to="/canteens"
+              className="bg-orange-500 text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-orange-600 transition-colors">
+              Order Now
             </Link>
-          </motion.div>
+          </div>
 
-          <motion.div
-            whileHover={{ y: -4, scale: 1.01 }}
-            className="bg-gradient-to-br from-slate-900 via-slate-900 to-purple-950/30 border border-slate-800 hover:border-purple-500/40 rounded-3xl p-6 shadow-2xl backdrop-blur-xl flex items-center justify-between group transition-all"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform">
-                <Users className="w-6 h-6" />
+          <div className="bg-purple-50 border border-purple-100 rounded-2xl p-5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center">
+                <Users className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-extrabold text-slate-100 text-base group-hover:text-purple-400 transition-colors">Group Order Room</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Host live order rooms with friends & split the bill</p>
+                <p className="font-semibold text-gray-900 text-sm">Group Ordering Room</p>
+                <p className="text-xs text-gray-500">Order with friends & split the bill live</p>
               </div>
             </div>
-            <Link
-              to="/group"
-              className="bg-purple-600 hover:bg-purple-500 text-white text-xs font-black px-4 py-2.5 rounded-xl transition-all flex items-center gap-1 shadow-lg shadow-purple-500/20"
-            >
-              Start Room <ArrowRight className="w-3.5 h-3.5" />
+            <Link to="/group"
+              className="bg-purple-600 text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-purple-700 transition-colors">
+              Start Group
             </Link>
-          </motion.div>
+          </div>
         </div>
 
         {/* Canteens Section */}
         <section>
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-black text-slate-100 tracking-tight">Featured Campus Canteens</h2>
-              <p className="text-xs text-slate-400 mt-0.5">Explore real-time ML wait times and menu options</p>
-            </div>
-            <Link to="/canteens" className="text-xs font-extrabold text-amber-400 flex items-center gap-1 hover:text-amber-300 transition-colors">
-              View All Canteens <ChevronRight className="w-4 h-4" />
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-gray-900">Our Canteens</h2>
+            <Link to="/canteens" className="text-sm text-orange-500 flex items-center gap-1 hover:underline">
+              View all <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
 
           {loading ? (
             <Loader />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {canteens.slice(0, 6).map((canteen, idx) => (
-                <motion.div
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {canteens.map((canteen) => (
+                <Link
                   key={canteen._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.08 }}
-                  whileHover={{ y: -6 }}
-                  className="bg-slate-900/80 border border-slate-800/90 rounded-3xl overflow-hidden shadow-xl hover:border-amber-500/40 hover:shadow-2xl hover:shadow-amber-500/10 transition-all group flex flex-col justify-between"
+                  to={`/canteens/${canteen._id}/menu`}
+                  className="bg-white rounded-2xl overflow-hidden swiggy-card-shadow swiggy-card-hover group flex flex-col"
                 >
-                  <Link to={`/canteens/${canteen._id}/menu`}>
-                    <div className="h-44 bg-slate-800 relative overflow-hidden">
-                      {canteen.image ? (
-                        <img
-                          src={canteen.image}
-                          alt={canteen.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-5xl">
-                          🍽️
-                        </div>
-                      )}
-
-                      <div className="absolute top-3 right-3 text-[11px] font-bold px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                        <Cpu className="w-3.5 h-3.5 animate-pulse" />
-                        <span>~{canteen.estimatedWaitMinutes || 10} min wait</span>
+                  <div className="h-40 bg-gray-100 flex items-center justify-center relative overflow-hidden">
+                    {canteen.image ? (
+                      <img src={canteen.image} alt={canteen.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    ) : (
+                      <span className="text-5xl">🍽️</span>
+                    )}
+                    <div className={`absolute top-3 right-3 text-[10px] uppercase tracking-wider font-bold px-2.5 py-1 rounded-md shadow ${
+                      canteen.isOpen
+                        ? 'bg-green-600 text-white'
+                        : 'bg-red-600 text-white'
+                    }`}>
+                      {canteen.isOpen ? 'Open' : 'Closed'}
+                    </div>
+                  </div>
+                  <div className="p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-bold text-[#282c3f] text-base group-hover:text-orange-500 transition-colors line-clamp-1">
+                        {canteen.name}
+                      </h3>
+                      <p className="text-xs text-gray-500 mt-1 line-clamp-1">{canteen.location}</p>
+                    </div>
+                    <div className="flex items-center gap-2 mt-4 pt-3 border-t border-gray-50">
+                      <div className="flex items-center gap-0.5 bg-green-600 text-white text-[11px] font-bold px-1.5 py-0.5 rounded">
+                        <Star className="w-3 h-3 fill-current" />
+                        <span>{canteen.rating?.toFixed(1) || '4.0'}</span>
+                      </div>
+                      <span className="text-gray-300 text-xs">•</span>
+                      <div className="flex items-center gap-1 text-gray-600 text-xs font-semibold">
+                        <Clock className="w-3.5 h-3.5 text-gray-500" />
+                        <span>10–15 MINS</span>
                       </div>
                     </div>
-
-                    <div className="p-5">
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <h3 className="font-bold text-slate-100 text-lg group-hover:text-amber-400 transition-colors">
-                          {canteen.name}
-                        </h3>
-                        <div className="flex items-center gap-1 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-lg text-xs font-bold text-amber-400">
-                          <Star className="w-3 h-3 fill-amber-400" />
-                          <span>{canteen.rating?.toFixed(1) || '4.5'}</span>
-                        </div>
-                      </div>
-                      <p className="text-xs text-slate-400 line-clamp-1">{canteen.location}</p>
-
-                      <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-800/80 text-xs">
-                        <span className="font-bold text-slate-300">Wait Range: </span>
-                        <span className="text-amber-400 font-bold">{canteen.waitRange || '8 - 12 mins'}</span>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
+                  </div>
+                </Link>
               ))}
             </div>
           )}
         </section>
 
-        {/* How It Works Steps */}
+        {/* How it works */}
         <section>
-          <h2 className="text-xl font-black text-slate-100 mb-6">How Kore Canteen Works</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">How it works</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { step: '01', icon: '📱', title: 'Browse & Select', desc: 'Choose menu items from your favorite campus canteen.' },
-              { step: '02', icon: '⚡', title: 'AI Wait Prediction', desc: 'See real-time ML wait times and queue congestion metrics.' },
-              { step: '03', icon: '🎟️', title: 'Express QR Pickup', desc: 'Scan your pickup QR token at the counter and skip the queue.' },
+              { step: '1', icon: '📱', title: 'Browse & Order', desc: 'Choose your canteen and pre-order your meal in advance' },
+              { step: '2', icon: '⏰', title: 'Select Pickup Slot', desc: 'Pick a convenient time slot for your break period' },
+              { step: '3', icon: '🎟️', title: 'Collect with QR', desc: 'Show your QR token at the counter and collect your food' },
             ].map((item) => (
-              <motion.div
-                key={item.step}
-                whileHover={{ y: -4 }}
-                className="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 backdrop-blur-xl shadow-lg relative overflow-hidden"
-              >
-                <div className="text-4xl font-black text-slate-800 absolute right-4 bottom-2 select-none pointer-events-none">
-                  {item.step}
+              <div key={item.step} className="bg-white rounded-2xl border border-gray-100 p-5 flex gap-4">
+                <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-xl flex-shrink-0">
+                  {item.icon}
                 </div>
-                <div className="text-3xl mb-3">{item.icon}</div>
-                <h3 className="font-extrabold text-slate-100 text-base mb-1">{item.title}</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">{item.desc}</p>
-              </motion.div>
+                <div>
+                  <p className="text-xs text-orange-500 font-semibold mb-0.5">Step {item.step}</p>
+                  <p className="font-semibold text-gray-900 text-sm">{item.title}</p>
+                  <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
+                </div>
+              </div>
             ))}
           </div>
         </section>

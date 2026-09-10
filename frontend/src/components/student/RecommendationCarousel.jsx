@@ -1,8 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
-import { motion } from 'framer-motion';
 import axiosInstance from '../../api/axiosInstance';
 import { CartContext } from '../../context/CartContext';
-import { Sparkles, Clock, ShoppingBag, Cpu } from 'lucide-react';
+import { Sparkles, Clock, ShoppingBag } from 'lucide-react';
 
 export default function RecommendationCarousel({ canteenId }) {
   const [recommendations, setRecommendations] = useState([]);
@@ -30,67 +29,50 @@ export default function RecommendationCarousel({ canteenId }) {
   if (loading || recommendations.length === 0) return null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/40 border border-slate-800 rounded-3xl p-6 shadow-2xl backdrop-blur-xl mb-8 relative overflow-hidden"
-    >
-      <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div className="flex items-center justify-between mb-5 relative z-10">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 bg-gradient-to-tr from-amber-500 to-orange-500 rounded-xl text-slate-950 shadow-md shadow-amber-500/20">
-            <Sparkles className="w-4 h-4 animate-spin" />
-          </div>
-          <div>
-            <h2 className="text-lg font-black text-slate-100 flex items-center gap-2">
-              Recommended For You
-            </h2>
-            <p className="text-xs text-slate-400">ML Personalization Engine</p>
-          </div>
+    <div className="bg-gradient-to-r from-orange-500/10 via-amber-500/10 to-red-500/10 p-5 rounded-2xl border border-orange-200/50 mb-8">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-orange-500 animate-pulse" />
+          <h2 className="text-lg font-bold text-gray-900">Recommended for You</h2>
+          <span className="bg-orange-100 text-orange-700 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+            AI Personalized
+          </span>
         </div>
-
-        <span className="bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-extrabold px-3 py-1 rounded-full flex items-center gap-1">
-          <Cpu className="w-3.5 h-3.5" />
-          <span>AI Match</span>
-        </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 relative z-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {recommendations.slice(0, 3).map((item) => (
-          <motion.div
+          <div
             key={item._id}
-            whileHover={{ y: -4, scale: 1.02 }}
-            className="bg-slate-950/80 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between hover:border-amber-500/40 transition-all shadow-xl"
+            className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition-shadow"
           >
             <div>
               <div className="flex justify-between items-start mb-2">
-                <span className="text-[10px] font-bold px-2 py-0.5 bg-amber-500/10 text-amber-400 rounded-md border border-amber-500/20">
-                  {item.recommendationReason || 'Popular Choice'}
+                <span className="text-xs font-medium px-2 py-0.5 bg-amber-50 text-amber-700 rounded-md">
+                  {item.recommendationReason}
                 </span>
-                <span className="text-sm font-black text-amber-400">₹{item.price}</span>
+                <span className="text-sm font-bold text-gray-900">₹{item.price}</span>
               </div>
-              <h3 className="font-extrabold text-slate-100 text-sm mt-1">{item.name}</h3>
-              <p className="text-xs text-slate-400 line-clamp-2 mt-1 leading-relaxed">{item.description}</p>
+              <h3 className="font-semibold text-gray-800 text-base">{item.name}</h3>
+              <p className="text-xs text-gray-500 line-clamp-2 mt-1">{item.description}</p>
             </div>
 
-            <div className="mt-4 flex items-center justify-between pt-3 border-t border-slate-800/80">
-              <div className="flex items-center gap-1 text-[11px] text-slate-400 font-medium">
-                <Clock className="w-3.5 h-3.5 text-amber-400" />
+            <div className="mt-4 flex items-center justify-between pt-2 border-t border-gray-50">
+              <div className="flex items-center gap-1 text-xs text-gray-500">
+                <Clock className="w-3.5 h-3.5 text-gray-400" />
                 <span>{item.preparationTime || 10}m prep</span>
               </div>
-              <motion.button
-                whileTap={{ scale: 0.9 }}
+              <button
                 onClick={() => addToCart(item, item.canteen?._id || item.canteen, item.canteen?.name)}
-                className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 rounded-xl text-xs font-extrabold transition-all shadow-md shadow-amber-500/20"
+                className="flex items-center gap-1 px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-xs font-semibold transition-colors"
               >
                 <ShoppingBag className="w-3.5 h-3.5" />
                 Add
-              </motion.button>
+              </button>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }
