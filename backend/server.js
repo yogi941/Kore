@@ -55,6 +55,7 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
+app.get('/', (req, res) => res.json({ message: 'Kore Canteen API Server is running', health: '/api/health' }));
 app.get('/api/health', (req, res) => res.json({ status: 'OK', timestamp: new Date() }));
 app.use('/api/auth', authRoutes);
 app.use('/api/canteens', canteenRoutes);
