@@ -11,10 +11,29 @@
     @apply bg-[#f8f9fa] text-[#1e293b] antialiased selection:bg-orange-500 selection:text-white; 
   }
   
-  /* Inputs force crisp dark text color across all browsers & extensions */
-  input, textarea, select {
-    color: #0f172a !important;
+  /* FORCE JET-BLACK TYPED TEXT & AUTOFILL TEXT ACROSS ALL BROWSERS & EXTENSIONS */
+  input, select, textarea {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
     background-color: #ffffff !important;
+    font-weight: 700 !important;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active {
+    -webkit-text-fill-color: #000000 !important;
+    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+    box-shadow: 0 0 0px 1000px #ffffff inset !important;
+    color: #000000 !important;
+    font-weight: 700 !important;
+  }
+
+  /* Hide native browser password reveal eye icon (Edge / IE / Safari) */
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
   }
   
   /* Modern Swiggy style scrollbar */
