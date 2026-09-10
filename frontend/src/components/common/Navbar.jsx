@@ -1,6 +1,7 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, LogOut, User, UtensilsCrossed, Menu, X, Bell } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react';
+import { ShoppingCart, LogOut, User, UtensilsCrossed, Menu, X, Bell, Sparkles } from 'lucide-react';
 import { useState, useContext, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import useAuth from '../../hooks/useAuth';
 import { CartContext } from '../../context/CartContext';
 import useSocket from '../../hooks/useSocket';
@@ -91,122 +92,171 @@ const Navbar = () => {
   const links = isAdmin ? adminLinks : studentLinks;
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
+    <nav className="bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-50 shadow-2xl transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to={isAdmin ? '/admin/dashboard' : '/home'} className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-              <UtensilsCrossed className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold text-gray-900 text-lg">KCT<span className="text-orange-500">Eats</span></span>
+          <Link to={isAdmin ? '/admin/dashboard' : '/home'} className="flex items-center gap-2.5 group">
+            <motion.div
+              whileHover={{ rotate: 12, scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="w-9 h-9 bg-gradient-to-tr from-amber-500 via-orange-500 to-amber-400 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/25 ring-2 ring-amber-500/20"
+            >
+              <UtensilsCrossed className="w-5 h-5 text-slate-950 font-bold" />
+            </motion.div>
+            <span className="font-black text-slate-100 text-xl tracking-tight group-hover:text-amber-400 transition-colors">
+              KORE<span className="text-amber-400">Canteen</span>
+            </span>
           </Link>
 
-          {/* Desktop Links */}
-          <div className="hidden md:flex items-center gap-6">
-            {links.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`text-sm font-medium transition-colors ${
-                  location.pathname === link.path
-                    ? 'text-orange-500'
-                    : 'text-gray-600 hover:text-orange-500'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+          {/* Desktop Nav Links */}
+          <div className="hidden md:flex items-center gap-1">
+            {links.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`relative px-4 py-2 rounded-xl text-xs font-extrabold tracking-wide transition-all ${
+                    isActive
+                      ? 'text-amber-400'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+                  }`}
+                >
+                  {link.label}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeNavIndicator"
+                      className="absolute bottom-0 left-3 right-3 h-0.5 bg-gradient-to-r from-amber-500 to-orange-400 rounded-full"
+                    />
+                  )}
+                </Link>
+              );
+            })}
           </div>
 
-          {/* Right Actions */}
-          <div className="flex items-center gap-3">
+          {/* Right Action Icons */}
+          <div className="flex items-center gap-2.5">
             {!isAdmin && (
-              <Link to="/cart" className="relative p-2 text-gray-600 hover:text-orange-500 transition-colors">
-                <ShoppingCart className="w-5 h-5" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                    {totalItems > 9 ? '9+' : totalItems}
-                  </span>
-                )}
+              <Link to="/cart">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 hover:text-amber-400 hover:border-amber-500/40 transition-all shadow-md"
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  {totalItems > 0 && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1.5 -right-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-black shadow-lg shadow-amber-500/30"
+                    >
+                      {totalItems > 9 ? '9+' : totalItems}
+                    </motion.span>
+                  )}
+                </motion.div>
               </Link>
             )}
+
             {/* Notification Bell */}
             <div className="relative">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-2 text-gray-600 hover:text-orange-500 transition-colors"
+                className="relative p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 hover:text-amber-400 hover:border-amber-500/40 transition-all shadow-md"
               >
-                <Bell className="w-5 h-5" />
+                <Bell className="w-4 h-4" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 bg-orange-500 rounded-full w-2 h-2" />
+                  <span className="absolute top-2 right-2 bg-amber-400 rounded-full w-2 h-2 animate-ping" />
                 )}
-              </button>
+              </motion.button>
 
-              {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50/50">
-                    <h3 className="font-semibold text-gray-900 text-[11px] uppercase tracking-wider">Notifications</h3>
-                    {unreadCount > 0 && (
-                      <button
-                        onClick={handleMarkAllAsRead}
-                        className="text-xs text-orange-500 hover:text-orange-600 font-medium"
-                      >
-                        Mark all as read
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="max-h-72 overflow-y-auto divide-y divide-gray-50">
-                    {notifications.length === 0 ? (
-                      <div className="px-4 py-8 text-center text-gray-400 text-xs">
-                        No notifications yet
-                      </div>
-                    ) : (
-                      notifications.map((notif) => (
-                        <div
-                          key={notif._id}
-                          onClick={() => handleMarkAsRead(notif._id)}
-                          className={`px-4 py-3 text-left transition-colors cursor-pointer ${
-                            notif.isRead ? 'bg-white hover:bg-gray-50/50' : 'bg-orange-50/20 hover:bg-orange-50/30'
-                          }`}
+              <AnimatePresence>
+                {showNotifications && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 mt-3 w-80 bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden backdrop-blur-2xl"
+                  >
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-slate-950/80">
+                      <h3 className="font-extrabold text-slate-200 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                        Notifications
+                      </h3>
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={handleMarkAllAsRead}
+                          className="text-[11px] text-amber-400 hover:text-amber-300 font-bold"
                         >
-                          <div className="flex items-start gap-2">
-                            {!notif.isRead && (
-                              <span className="w-1.5 h-1.5 mt-1.5 bg-orange-500 rounded-full shrink-0" />
-                            )}
-                            <div>
-                              <p className={`text-xs ${notif.isRead ? 'text-gray-800 font-medium' : 'text-gray-950 font-bold'}`}>
-                                {notif.title}
-                              </p>
-                              <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">
-                                {notif.message}
-                              </p>
-                              <p className="text-[9px] text-gray-400 mt-1">
-                                {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                              </p>
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="max-h-72 overflow-y-auto divide-y divide-slate-800/60">
+                      {notifications.length === 0 ? (
+                        <div className="px-4 py-8 text-center text-slate-500 text-xs">
+                          No notifications yet
+                        </div>
+                      ) : (
+                        notifications.map((notif) => (
+                          <div
+                            key={notif._id}
+                            onClick={() => handleMarkAsRead(notif._id)}
+                            className={`px-4 py-3 text-left transition-colors cursor-pointer ${
+                              notif.isRead ? 'bg-slate-900/40 hover:bg-slate-800/40' : 'bg-amber-500/10 hover:bg-amber-500/15'
+                            }`}
+                          >
+                            <div className="flex items-start gap-2">
+                              {!notif.isRead && (
+                                <span className="w-2 h-2 mt-1.5 bg-amber-400 rounded-full shrink-0 animate-pulse" />
+                              )}
+                              <div>
+                                <p className={`text-xs ${notif.isRead ? 'text-slate-300 font-semibold' : 'text-amber-300 font-extrabold'}`}>
+                                  {notif.title}
+                                </p>
+                                <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                                  {notif.message}
+                                </p>
+                                <p className="text-[9px] text-slate-500 mt-1 font-mono">
+                                  {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
+                        ))
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            <Link to={isAdmin ? '/admin/dashboard' : '/profile'} className="p-2 text-gray-600 hover:text-orange-500 transition-colors">
-              <User className="w-5 h-5" />
+            {/* Profile & Logout */}
+            <Link to={isAdmin ? '/admin/dashboard' : '/profile'}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 hover:text-amber-400 hover:border-amber-500/40 transition-all shadow-md"
+              >
+                <User className="w-4 h-4" />
+              </motion.div>
             </Link>
-            <button
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={handleLogout}
-              className="hidden md:flex items-center gap-1 text-sm text-gray-600 hover:text-red-500 transition-colors"
+              className="hidden md:flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all border border-transparent hover:border-rose-500/30"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-3.5 h-3.5" />
               Logout
-            </button>
+            </motion.button>
+
             <button
-              className="md:hidden p-2 text-gray-600"
+              className="md:hidden p-2 text-slate-400 hover:text-slate-200"
               onClick={() => setMobileOpen(!mobileOpen)}
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -214,18 +264,22 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Dropdown */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-gray-100 py-3 space-y-1">
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="md:hidden border-t border-slate-800 py-3 space-y-1"
+          >
             {links.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 onClick={() => setMobileOpen(false)}
-                className={`block px-3 py-2 rounded-lg text-sm font-medium ${
+                className={`block px-4 py-2.5 rounded-xl text-xs font-extrabold ${
                   location.pathname === link.path
-                    ? 'bg-orange-50 text-orange-500'
-                    : 'text-gray-600 hover:bg-gray-50'
+                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                    : 'text-slate-400 hover:bg-slate-900'
                 }`}
               >
                 {link.label}
@@ -233,12 +287,12 @@ const Navbar = () => {
             ))}
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg"
+              className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-bold text-rose-400 hover:bg-rose-500/10 rounded-xl"
             >
               <LogOut className="w-4 h-4" />
               Logout
             </button>
-          </div>
+          </motion.div>
         )}
       </div>
     </nav>
