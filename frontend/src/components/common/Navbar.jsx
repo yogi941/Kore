@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLocation } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCart, LogOut, User, UtensilsCrossed, Menu, X, Bell, Sparkles } from 'lucide-react';
 import { useState, useContext, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
