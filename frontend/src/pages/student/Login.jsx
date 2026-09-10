@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { UtensilsCrossed, Eye, EyeOff, Sparkles, Lock, Mail, ArrowRight } from 'lucide-react';
+import { UtensilsCrossed, Eye, EyeOff, Lock, Mail, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { loginUser } from '../../api/authApi';
 import useAuth from '../../hooks/useAuth';
@@ -48,9 +48,10 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex items-center justify-center px-4 py-12 relative overflow-hidden">
-      {/* Background Subtle Accent Glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-orange-400/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50/80 via-amber-50/50 to-orange-100/60 flex items-center justify-center px-4 py-12 relative overflow-hidden">
+      {/* Background Accent Glow */}
+      <div className="absolute top-10 left-10 w-72 h-72 bg-orange-300/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-10 right-10 w-80 h-80 bg-amber-300/30 rounded-full blur-3xl pointer-events-none"></div>
 
       <motion.div
         initial={{ opacity: 0, y: 15 }}
@@ -62,19 +63,19 @@ const Login = () => {
           <motion.div
             whileHover={{ scale: 1.05, rotate: 6 }}
             whileTap={{ scale: 0.95 }}
-            className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-tr from-orange-500 to-amber-500 rounded-2xl mb-4 shadow-xl shadow-orange-500/20 text-white"
+            className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-tr from-orange-500 to-amber-500 rounded-2xl mb-4 shadow-xl shadow-orange-500/25 text-white"
           >
             <UtensilsCrossed className="w-8 h-8 stroke-[2.5]" />
           </motion.div>
           
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-1">
-            Welcome to <span className="text-orange-500">KORECanteen</span>
+            Welcome to <span className="text-orange-500">KCTEats</span>
           </h1>
           <p className="text-slate-500 text-sm font-medium">Pre-order your food, skip the queue</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-gray-200/80 p-8">
+        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-200/80 p-8 backdrop-blur-md">
           {/* Tab Selector */}
           <div className="flex p-1 bg-slate-100 rounded-2xl mb-6 border border-slate-200">
             <button

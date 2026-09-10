@@ -11,14 +11,31 @@
     @apply bg-[#f8f9fa] text-[#1e293b] antialiased selection:bg-orange-500 selection:text-white; 
   }
   
-  /* FORCE JET-BLACK TYPED TEXT & AUTOFILL TEXT ACROSS ALL BROWSERS & EXTENSIONS */
-  input, select, textarea {
+  /* FORCE ALL INPUT TYPED TEXT TO BE BOLD JET-BLACK (#000000) WITH HIGH CONTRAST */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="search"],
+  textarea,
+  select {
     color: #000000 !important;
     -webkit-text-fill-color: #000000 !important;
     background-color: #ffffff !important;
     font-weight: 700 !important;
+    opacity: 1 !important;
   }
 
+  input:focus,
+  textarea:focus,
+  select:focus {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    background-color: #ffffff !important;
+    opacity: 1 !important;
+  }
+
+  /* Fix webkit autofill overriding text color */
   input:-webkit-autofill,
   input:-webkit-autofill:hover, 
   input:-webkit-autofill:focus, 
@@ -28,6 +45,14 @@
     box-shadow: 0 0 0px 1000px #ffffff inset !important;
     color: #000000 !important;
     font-weight: 700 !important;
+  }
+
+  /* Placeholder styling */
+  ::placeholder {
+    color: #94a3b8 !important;
+    -webkit-text-fill-color: #94a3b8 !important;
+    opacity: 1 !important;
+    font-weight: 500 !important;
   }
 
   /* Hide native browser password reveal eye icon (Edge / IE / Safari) */
